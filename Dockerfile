@@ -1,6 +1,6 @@
 FROM alpine:latest as builder
 WORKDIR /tmp
-RUN apk update && apk add  g++ make autoconf libtool pkgconfig git
+RUN apk update && apk add  g++ make autoconf libtool pkgconfig git automake
 RUN cd /tmp && git clone https://github.com/grpc/grpc && cd grpc && git submodule update --init
 RUN cd grpc && make plugins -j8
 
