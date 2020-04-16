@@ -7,6 +7,8 @@ ADD https://jpa.kapsi.fi/nanopb/download/nanopb-0.4.1-linux-x86.tar.gz /tmp/
 RUN cd /tmp && tar xvf nanopb-0.4.1-linux-x86.tar.gz
 RUN cd /tmp/nanopb-0.4.1-linux-x86/generator/proto && make
 
+FROM uber/prototool:latest as prototool
+
 FROM namely/prototool:1.27_0
 RUN apk add g++
 ADD https://github.com/grpc/grpc-web/releases/download/1.0.7/protoc-gen-grpc-web-1.0.7-linux-x86_64 /bin/protoc-gen-grpc-web
@@ -23,3 +25,4 @@ COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/protoc-gen-nanopb /bin
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/proto /bin/proto
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/nanopb /bin/nanopb
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/nanopb_generator.py /bin/
+COPY --from=prototool /usr/local/bin/prototool /usr/local/bin/prototool
