@@ -28,8 +28,6 @@ RUN cd /tmp && LD_LIBRARY_PATH=/usr/lib npm i grpc-tools && tree && cp node_modu
 RUN gem update --system
 RUN gem install grpc
 RUN gem install grpc-tools
-#RUN git clone https://github.com/grpc/grpc/
-#RUN cd grpc/src/ruby && bundle install && rake
 
 COPY --from=builder /tmp/grpc/bins/opt/grpc_python_plugin /bin/protoc-gen-grpc_python
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/protoc-gen-nanopb /bin/
