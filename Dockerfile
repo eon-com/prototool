@@ -28,6 +28,8 @@ RUN cd /tmp && LD_LIBRARY_PATH=/usr/lib npm i grpc-tools && tree && cp node_modu
 RUN gem update --system
 RUN gem install grpc
 RUN gem install grpc-tools
+ADD https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v1.16.0/protoc-gen-swagger-v1.16.0-linux-x86_64 /usr/local/bin/protoc-gen-swagger
+RUN chmod +x /usr/local/bin/protoc-gen-swagger
 
 COPY --from=builder /tmp/grpc/bins/opt/grpc_python_plugin /bin/protoc-gen-grpc_python
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/protoc-gen-nanopb /bin/
