@@ -9,13 +9,16 @@ RUN cd /tmp/nanopb-0.4.1-linux-x86/generator/proto && make
 
 FROM uber/prototool:1.10.0 as prototool
 
-FROM ubuntu as ubuntu
+FROM ubuntu:latest as ubuntu
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install golang-go ca-certificates git -y
-RUN CGO_ENABLED=0 go get google.golang.org/protobuf/cmd/protoc-gen-go
-RUN CGO_ENABLED=0 go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go
-RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+ENV GO111MODULE=on
+#RUN CGO_ENABLED=0 go get google.golang.org/protobuf/cmd/protoc-gen-go
+#RUN CGO_ENABLED=0 go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
+RUN go get google.golang.org/protobuf/cmd/protoc-gen-go@v1.25.0
+RUN go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.0.1
+RUN go get github.com/chrusty/protoc-gen-jsonschema/cmd/protoc-gen-jsonschema
+RUN go install github.com/chrusty/protoc-gen-jsonschema/cmd/protoc-gen-jsonschema
 
 FROM namely/prototool:1.27_0
 RUN apk add go git
@@ -30,6 +33,8 @@ RUN apk add glibc-2.29-r0.apk --force
 RUN apk add py-pip
 RUN apk add libgcc
 RUN pip install protobuf
+RUN apk add python3 gcc python3-dev
+RUN pip3 install "betterproto[compiler]"==1.2.5
 RUN apk add nodejs npm tree libgcc
 RUN npm i -g request
 RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
@@ -56,3 +61,4 @@ COPY --from=prototool /usr/local/bin/prototool /usr/local/bin/prototool
 COPY --from=prototool /usr/local/bin/prototool /usr/local/bin/prototool
 COPY --from=ubuntu /root/go/bin/protoc-gen-go /usr/local/bin/protoc-gen-go
 COPY --from=ubuntu /root/go/bin/protoc-gen-go-grpc /usr/local/bin/protoc-gen-go-grpc
+COPY --from=ubuntu /root/go/bin/protoc-gen-jsonschema /usr/local/bin/protoc-gen-jsonschema
