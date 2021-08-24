@@ -1,8 +1,6 @@
 FROM alpine:latest as builder
 WORKDIR /tmp
-RUN apk update && apk add linux-headers g++ make autoconf libtool pkgconfig git automake python python-dev
-RUN cd /tmp && git clone https://github.com/grpc/grpc && cd grpc && git submodule update --init
-RUN cd grpc && make plugins -j8
+RUN apk update && apk add linux-headers g++ make autoconf libtool pkgconfig git automake python3 python3-dev
 ADD https://jpa.kapsi.fi/nanopb/download/nanopb-0.4.1-linux-x86.tar.gz /tmp/
 RUN cd /tmp && tar xvf nanopb-0.4.1-linux-x86.tar.gz
 RUN cd /tmp/nanopb-0.4.1-linux-x86/generator/proto && make
@@ -15,8 +13,8 @@ RUN apt update && apt install golang-go ca-certificates git -y
 ENV GO111MODULE=on
 #RUN CGO_ENABLED=0 go get google.golang.org/protobuf/cmd/protoc-gen-go
 #RUN CGO_ENABLED=0 go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
-RUN go get google.golang.org/protobuf/cmd/protoc-gen-go@v1.25.0
-RUN go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.0.1
+RUN go get google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
+RUN go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1.0
 RUN go get github.com/chrusty/protoc-gen-jsonschema/cmd/protoc-gen-jsonschema
 RUN go install github.com/chrusty/protoc-gen-jsonschema/cmd/protoc-gen-jsonschema
 
@@ -52,7 +50,6 @@ RUN chmod +x /usr/local/bin/protoc-gen-openapiv2
 ADD https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.4.0/protoc-gen-doc-1.4.0.linux-amd64.go1.15.2.tar.gz /usr/local/bin/protoc-gen-doc
 RUN chmod +x /usr/local/bin/protoc-gen-doc
 
-COPY --from=builder /tmp/grpc/bins/opt/grpc_python_plugin /bin/protoc-gen-grpc_python
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/protoc-gen-nanopb /bin/
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/proto /bin/proto
 COPY --from=builder /tmp/nanopb-0.4.1-linux-x86/generator/nanopb /bin/nanopb
